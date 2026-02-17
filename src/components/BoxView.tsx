@@ -17,6 +17,9 @@ export const BoxView: React.FC<BoxViewProps> = ({ box, onBack, onUpdate, onDelet
     const [selectedCell, setSelectedCell] = useState<{ row: number, col: number } | null>(null);
     const [cellEditData, setCellEditData] = useState<Partial<BoxCell>>({});
     const [showQR, setShowQR] = useState(false);
+    const [isResizing, setIsResizing] = useState(false);
+    const [tempRows, setTempRows] = useState(box.rows);
+    const [tempCols, setTempCols] = useState(box.cols);
 
     const handleCellClick = (row: number, col: number) => {
         setSelectedCell({ row, col });
@@ -53,6 +56,28 @@ export const BoxView: React.FC<BoxViewProps> = ({ box, onBack, onUpdate, onDelet
         setCellEditData({ name: '', content: '', type: 'empty' });
     };
 
+    const handleResize = async () => {
+        const rowCount = Math.max(1, Math.min(50, tempRows));
+        const colCount = Math.max(1, Math.min(50, tempCols));
+
+        // Cleanup cells outside new boundaries
+        const cleanedCells = { ...box.cells };
+        Object.keys(cleanedCells).forEach(id => {
+            const [r, c] = id.split('-').map(Number);
+            if (r >= rowCount || c >= colCount) {
+                delete cleanedCells[id];
+            }
+        });
+
+        await onUpdate({
+            ...box,
+            rows: rowCount,
+            cols: colCount,
+            cells: cleanedCells
+        });
+        setIsResizing(false);
+    };
+
     return (
         <div className="box-view-container">
             <div className="box-header">
@@ -62,6 +87,13 @@ export const BoxView: React.FC<BoxViewProps> = ({ box, onBack, onUpdate, onDelet
                     <p>{box.rows}x{box.cols} Storage Matrix • {Object.keys(box.cells).length} Samples</p>
                 </div>
                 <div className="box-actions">
+                    <button
+                        className={`btn-secondary ${isResizing ? 'active' : ''}`}
+                        onClick={() => setIsResizing(!isResizing)}
+                    >
+                        <Edit3 size={18} />
+                        {isResizing ? 'Cancel Resize' : 'Resize Matrix'}
+                    </button>
                     <button className="btn-secondary" onClick={() => setShowQR(!showQR)}>
                         <Printer size={18} />
                         {showQR ? 'Show Grid' : 'Print Label'}
@@ -71,6 +103,40 @@ export const BoxView: React.FC<BoxViewProps> = ({ box, onBack, onUpdate, onDelet
                     </button>
                 </div>
             </div>
+
+            {isResizing && (
+                <div className="resize-toolbar glass glow-emerald">
+                    <div className="resize-inputs">
+                        <div className="input-group">
+                            <label>Rows</label>
+                            <input
+                                type="number"
+                                value={tempRows}
+                                onChange={e => setTempRows(parseInt(e.target.value) || 0)}
+                                min="1"
+                                max="50"
+                            />
+                        </div>
+                        <div className="input-group">
+                            <label>Columns</label>
+                            <input
+                                type="number"
+                                value={tempCols}
+                                onChange={e => setTempCols(parseInt(e.target.value) || 0)}
+                                min="1"
+                                max="50"
+                            />
+                        </div>
+                    </div>
+                    <div className="resize-info">
+                        <p>Changes will be saved immediately. Samples outside the new grid will be deleted.</p>
+                    </div>
+                    <button className="btn-primary" onClick={handleResize}>
+                        <Save size={18} />
+                        Apply Dimensions
+                    </button>
+                </div>
+            )}
 
             <div className="box-content-layout">
                 <div className="grid-section">
