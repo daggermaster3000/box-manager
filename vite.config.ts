@@ -14,6 +14,11 @@ export default defineConfig({
         short_name: 'BoxManager',
         description: 'Manage biological sample boxes with QR codes',
         theme_color: '#0a0a0b',
+        background_color: '#0a0a0b',
+        display: 'standalone',
+        start_url: '/',
+        scope: '/',
+        orientation: 'portrait',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -23,7 +28,8 @@ export default defineConfig({
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
           }
         ]
       }
