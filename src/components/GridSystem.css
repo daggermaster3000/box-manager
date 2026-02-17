@@ -3,7 +3,14 @@
     border-radius: 12px;
     overflow: auto;
     max-width: 100%;
-    max-height: calc(100vh - 200px);
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 769px) {
+    .grid-wrapper {
+        max-height: calc(100vh - 200px);
+    }
 }
 
 .grid-container {

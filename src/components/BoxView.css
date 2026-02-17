@@ -42,8 +42,8 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    min-height: 0;
-    overflow-y: auto;
+    flex: 1;
+    overflow-y: visible;
 }
 
 .details-panel {
@@ -232,20 +232,22 @@
 
 @media (max-width: 768px) {
     .box-content-layout {
-        grid-template-columns: 1fr;
         display: flex;
         flex-direction: column;
+        gap: 1.5rem;
     }
 
     .grid-section {
         order: 2;
+        flex: none;
+        height: auto;
     }
 
     .details-panel {
         order: 1;
         position: relative;
         top: 0;
-        margin-bottom: 2rem;
+        margin-bottom: 0;
         width: 100%;
     }
 
