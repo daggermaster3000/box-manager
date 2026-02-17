@@ -1,0 +1,139 @@
+.grid-wrapper {
+    padding: 1rem;
+    border-radius: 12px;
+    overflow: auto;
+    max-width: 100%;
+    max-height: calc(100vh - 200px);
+}
+
+.grid-container {
+    display: grid;
+    gap: 2px;
+    min-width: 600px;
+    background: var(--grid-line);
+}
+
+.grid-cell {
+    background: rgba(20, 20, 23, 0.4);
+    aspect-ratio: 1;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s ease;
+    min-width: 20px;
+}
+
+.grid-cell:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.grid-cell.selected {
+    outline: 2px solid var(--accent-cyan);
+    background: var(--accent-cyan-glow);
+    z-index: 2;
+}
+
+.grid-cell.sample {
+    background: var(--accent-emerald-glow);
+}
+
+.grid-cell.sample .cell-indicator {
+    width: 60%;
+    height: 60%;
+    background: var(--accent-emerald);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-emerald);
+}
+
+.grid-cell.control {
+    background: rgba(168, 85, 247, 0.2);
+}
+
+.grid-cell.control .cell-indicator {
+    width: 60%;
+    height: 60%;
+    background: #a855f7;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #a855f7;
+}
+
+.grid-cell.primers {
+    background: var(--accent-cyan-glow);
+}
+
+.grid-cell.primers .cell-indicator {
+    width: 60%;
+    height: 60%;
+    background: var(--accent-cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.grid-cell.plasmid {
+    background: rgba(234, 179, 8, 0.2);
+}
+
+.grid-cell.plasmid .cell-indicator {
+    width: 60%;
+    height: 60%;
+    background: #eab308;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #eab308;
+}
+
+.grid-cell.antibody {
+    background: rgba(139, 92, 246, 0.2);
+}
+
+.grid-cell.antibody .cell-indicator {
+    width: 60%;
+    height: 60%;
+    background: #8b5cf6;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #8b5cf6;
+}
+
+.grid-cell.reagent {
+    background: rgba(244, 63, 94, 0.2);
+}
+
+.grid-cell.reagent .cell-indicator {
+    width: 60%;
+    height: 60%;
+    background: #f43f5e;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #f43f5e;
+}
+
+.cell-name {
+    font-size: 0.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-align: center;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 1;
+    pointer-events: none;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+.cell-label {
+    font-size: 0.5rem;
+    color: var(--text-secondary);
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    pointer-events: none;
+    font-family: var(--font-mono);
+}
+
+.grid-cell.empty {
+    opacity: 0.5;
+}
