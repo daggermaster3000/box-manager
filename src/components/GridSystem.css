@@ -5,6 +5,15 @@
     max-width: 100%;
     width: 100%;
     background: rgba(0, 0, 0, 0.2);
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    overscroll-behavior: contain;
+}
+
+@media (max-width: 768px) {
+    .grid-wrapper {
+        max-height: 450px;
+    }
 }
 
 @media (min-width: 769px) {
@@ -16,8 +25,16 @@
 .grid-container {
     display: grid;
     gap: 2px;
-    min-width: 500px;
+    min-width: 800px;
+    /* Increased to ensure scrolling is always possible/needed on mobile */
     background: var(--grid-line);
+}
+
+@media (max-width: 768px) {
+    .grid-container {
+        min-width: 600px;
+        /* Still wider than most phones */
+    }
 }
 
 @media (max-width: 480px) {
