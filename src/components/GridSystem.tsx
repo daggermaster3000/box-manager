@@ -2,11 +2,16 @@ import { useMemo } from 'react';
 import type { Box } from '../lib/storage';
 import { motion } from 'framer-motion';
 
+import plasmidIcon from '../assets/plasmid.png';
+import reagentIcon from '../assets/reagent.png';
+import primerIcon from '../assets/primer.png';
+import aliquotIcon from '../assets/aliquot.png';
+
 const TYPE_ICONS: Record<string, string> = {
-    plasmid: '/assets/plasmid.png',
-    reagent: '/assets/reagent.png',
-    primers: '/assets/primer.png',
-    aliquot: '/assets/aliquot.png',
+    plasmid: plasmidIcon,
+    reagent: reagentIcon,
+    primers: primerIcon,
+    aliquot: aliquotIcon,
 };
 
 interface GridSystemProps {
