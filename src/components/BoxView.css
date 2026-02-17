@@ -222,3 +222,42 @@
     text-align: center;
     padding: 2rem 0;
 }
+
+@media (max-width: 1024px) {
+    .box-content-layout {
+        grid-template-columns: 1fr 300px;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .box-content-layout {
+        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .grid-section {
+        order: 2;
+    }
+
+    .details-panel {
+        order: 1;
+        position: relative;
+        top: 0;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+
+    .box-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .box-actions {
+        margin-left: 0;
+        width: 100%;
+        justify-content: space-between;
+    }
+}

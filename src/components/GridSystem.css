@@ -9,8 +9,14 @@
 .grid-container {
     display: grid;
     gap: 2px;
-    min-width: 600px;
+    min-width: 500px;
     background: var(--grid-line);
+}
+
+@media (max-width: 480px) {
+    .grid-container {
+        min-width: 350px;
+    }
 }
 
 .grid-cell {
