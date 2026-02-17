@@ -362,6 +362,15 @@
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .main-content {
+    overflow-y: visible;
+    height: auto;
+    min-height: calc(100vh - 60px);
+    /* Adjust for header if needed */
   }
 
   .sidebar {
