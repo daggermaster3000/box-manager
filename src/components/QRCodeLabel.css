@@ -33,17 +33,67 @@
     opacity: 0.8;
 }
 
+.btn-print-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.4rem 0.8rem;
+    background: var(--accent-emerald);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .qr-label-printable,
+    .qr-label-printable * {
+        visibility: visible;
+    }
+
+    .qr-label-printable {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4in;
+        /* Standard label size hint */
+        background: white !important;
+        color: black !important;
+    }
+
+    .qr-label {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+
+    .qr-footer,
+    .qr-title,
+    .qr-dims {
+        color: black !important;
+    }
+}
+
 .qr-label {
     background: white;
     color: black;
     padding: 1.5rem;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    width: 280px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    width: 200px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    gap: 1.25rem;
+    text-align: center;
 }
 
 .qr-header {

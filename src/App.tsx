@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Layout, Grid as GridIcon, Package, Plus, Settings, Search, Trash2, Calendar } from 'lucide-react';
+import { Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { Layout, Grid as GridIcon, Package, Plus, Settings, Search, Trash2, Calendar, Menu, X } from 'lucide-react';
 import type { Box } from './lib/storage';
 import { storage } from './lib/storage';
 import { NewBoxModal } from './components/NewBoxModal';
@@ -10,11 +11,16 @@ import './components/Modal.css';
 import './components/BoxView.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'inventory'>('dashboard');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [boxes, setBoxes] = useState<Box[]>([]);
-  const [activeBoxId, setActiveBoxId] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNewBoxModal, setShowNewBoxModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Determine active tab from location
+  const activeTab = location.pathname.startsWith('/inventory') ? 'inventory' : 'dashboard';
+
 
   useEffect(() => {
     const initApp = async () => {
@@ -42,7 +48,7 @@ function App() {
       await storage.deleteBox(id);
       const updatedBoxes = await storage.getBoxes();
       setBoxes(updatedBoxes);
-      setActiveBoxId(null);
+      navigate('/');
     }
   };
 
@@ -52,28 +58,28 @@ function App() {
     setBoxes(updatedBoxes);
   };
 
-  const filteredBoxes = boxes.filter(b =>
-    b.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const activeBox = boxes.find(b => b.id === activeBoxId);
-
   return (
-    <div className="app-container">
-      <nav className="sidebar glass">
+    <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+      {/* Mobile Overlay */}
+      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
+
+      <nav className={`sidebar glass ${isSidebarOpen ? 'open' : ''}`}>
         <div className="logo-container">
           <div className="logo-icon glow-emerald">
             <Package size={24} color="var(--accent-emerald)" />
           </div>
           <h1>BIO<span>LAB</span></h1>
+          <button className="mobile-close" onClick={() => setIsSidebarOpen(false)}>
+            <X size={24} />
+          </button>
         </div>
 
         <div className="nav-links">
           <button
             className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => {
-              setActiveTab('dashboard');
-              setActiveBoxId(null);
+              navigate('/');
+              setIsSidebarOpen(false);
             }}
           >
             <Layout size={20} />
@@ -81,14 +87,20 @@ function App() {
           </button>
           <button
             className={`nav-item ${activeTab === 'inventory' ? 'active' : ''}`}
-            onClick={() => setActiveTab('inventory')}
+            onClick={() => {
+              navigate('/inventory');
+              setIsSidebarOpen(false);
+            }}
           >
             <GridIcon size={20} />
             <span>Inventory</span>
           </button>
           <button
             className="nav-item"
-            onClick={() => setShowNewBoxModal(true)}
+            onClick={() => {
+              setShowNewBoxModal(true);
+              setIsSidebarOpen(false);
+            }}
           >
             <Plus size={20} />
             <span>Create New Box</span>
@@ -96,7 +108,7 @@ function App() {
         </div>
 
         <div className="sidebar-footer">
-          <div className="version-tag">SYSTEM v1.0.4</div>
+          <div className="version-tag">SYSTEM v1.0.5</div>
           <button className="nav-item">
             <Settings size={20} />
             <span>Settings</span>
@@ -106,120 +118,55 @@ function App() {
 
       <main className="main-content">
         <header className="top-header glass">
+          <button className="mobile-menu-toggle" onClick={() => setIsSidebarOpen(true)}>
+            <Menu size={24} />
+          </button>
           <div className="header-info">
-            <h2>{activeBox ? activeBox.name : activeTab === 'dashboard' ? 'Laboratory Overview' : 'Box Inventory'}</h2>
+            <Routes>
+              <Route path="/box/:id" element={<BoxTitle boxes={boxes} />} />
+              <Route path="/inventory" element={<h2>Box Inventory</h2>} />
+              <Route path="/" element={<h2>Laboratory Overview</h2>} />
+            </Routes>
             <p className="status-text"><span className="status-dot"></span> Secure Storage Active</p>
           </div>
           <div className="header-actions">
-            {!activeBox && (
-              <div className="search-bar">
-                <Search size={18} />
-                <input
-                  type="text"
-                  placeholder="Filter boxes..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                />
-              </div>
-            )}
+            <div className="search-bar desktop-only">
+              <Search size={18} />
+              <input
+                type="text"
+                placeholder="Filter boxes..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+              />
+            </div>
             <button className="btn-primary glow-emerald" onClick={() => setShowNewBoxModal(true)}>
               <Plus size={18} />
-              New Box
+              <span className="btn-text">New Box</span>
             </button>
           </div>
         </header>
 
         <section className="view-content">
-          {activeBox ? (
-            <BoxView
-              box={activeBox}
-              onBack={() => setActiveBoxId(null)}
-              onUpdate={handleUpdateBox}
-              onDelete={handleDeleteBox}
-            />
-          ) : activeTab === 'dashboard' ? (
-            <div className="dashboard-layout">
-              <div className="stats-row">
-                <div className="card glass">
-                  <div className="card-header">
-                    <Package size={20} color="var(--accent-cyan)" />
-                    <h3>Storage Boxes</h3>
-                  </div>
-                  <div className="stat-value">{boxes.length}</div>
-                </div>
-                <div className="card glass">
-                  <div className="card-header">
-                    <GridIcon size={20} color="var(--accent-emerald)" />
-                    <h3>Total Slots</h3>
-                  </div>
-                  <div className="stat-value">
-                    {boxes.reduce((acc, b) => acc + (b.rows * b.cols), 0).toLocaleString()}
-                  </div>
-                </div>
-                <div className="card glass">
-                  <div className="card-header">
-                    <Calendar size={20} color="#a855f7" />
-                    <h3>Active Samples</h3>
-                  </div>
-                  <div className="stat-value">
-                    {boxes.reduce((acc, b) => acc + Object.keys(b.cells).length, 0)}
-                  </div>
-                </div>
-              </div>
-
-              <div className="recent-activity section">
-                <h3>Recent Storage Units</h3>
-                <div className="boxes-grid">
-                  {boxes.slice(0, 4).map(box => (
-                    <div key={box.id} className="box-card glass" onClick={() => setActiveBoxId(box.id)}>
-                      <div className="box-card-icon">
-                        <GridIcon size={24} color="var(--accent-cyan)" />
-                      </div>
-                      <div className="box-card-content">
-                        <h4>{box.name}</h4>
-                        <p>{box.rows}x{box.cols} • {Object.keys(box.cells).length} items</p>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="box-card glass add-new" onClick={() => setShowNewBoxModal(true)}>
-                    <Plus size={32} opacity={0.3} />
-                    <p>Register New Unit</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="inventory-view">
-              <div className="boxes-table glass">
-                <div className="table-header">
-                  <div className="col">Name</div>
-                  <div className="col">Dimensions</div>
-                  <div className="col">Samples</div>
-                  <div className="col">Created</div>
-                  <div className="col actions"></div>
-                </div>
-                {filteredBoxes.map(box => (
-                  <div key={box.id} className="table-row" onClick={() => setActiveBoxId(box.id)}>
-                    <div className="col name">
-                      <Package size={16} />
-                      {box.name}
-                    </div>
-                    <div className="col">{box.rows}x{box.cols}</div>
-                    <div className="col">{Object.keys(box.cells).length}</div>
-                    <div className="col text-dim">{new Date(box.createdAt || Date.now()).toLocaleDateString()}</div>
-                    <div className="col actions">
-                      <button className="btn-icon-small" onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteBox(box.id);
-                      }}>
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <Routes>
+            <Route path="/box/:id" element={
+              <BoxRouteWrapper
+                boxes={boxes}
+                onUpdate={handleUpdateBox}
+                onDelete={handleDeleteBox}
+              />
+            } />
+            <Route path="/inventory" element={
+              <InventoryView
+                boxes={boxes}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onDelete={handleDeleteBox}
+              />
+            } />
+            <Route path="/" element={
+              <DashboardView boxes={boxes} setShowNewBoxModal={setShowNewBoxModal} />
+            } />
+          </Routes>
         </section>
       </main>
 
@@ -232,5 +179,134 @@ function App() {
     </div>
   );
 }
+
+// Sub-components for cleaner Routing
+const BoxTitle = ({ boxes }: { boxes: Box[] }) => {
+  const { id } = useParams();
+  const box = boxes.find(b => b.id === id);
+  return <h2>{box ? box.name : 'Storage Box'}</h2>;
+};
+
+const BoxRouteWrapper = ({ boxes, onUpdate, onDelete }: { boxes: Box[], onUpdate: any, onDelete: any }) => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const box = boxes.find(b => b.id === id);
+
+  if (!box) return <div className="loader">Box not found</div>;
+
+  return (
+    <BoxView
+      box={box}
+      onBack={() => navigate('/inventory')}
+      onUpdate={onUpdate}
+      onDelete={onDelete}
+    />
+  );
+};
+
+const InventoryView = ({ boxes, searchQuery, setSearchQuery, onDelete }: any) => {
+  const navigate = useNavigate();
+  const filteredBoxes = boxes.filter((b: Box) =>
+    b.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="inventory-view">
+      <div className="search-bar mobile-only">
+        <Search size={18} />
+        <input
+          type="text"
+          placeholder="Filter boxes..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+        />
+      </div>
+      <div className="boxes-table glass">
+        <div className="table-header">
+          <div className="col">Name</div>
+          <div className="col">Dimensions</div>
+          <div className="col">Samples</div>
+          <div className="col desktop-only">Created</div>
+          <div className="col actions"></div>
+        </div>
+        {filteredBoxes.map((box: Box) => (
+          <div key={box.id} className="table-row" onClick={() => navigate(`/box/${box.id}`)}>
+            <div className="col name">
+              <Package size={16} />
+              {box.name}
+            </div>
+            <div className="col">{box.rows}x{box.cols}</div>
+            <div className="col">{Object.keys(box.cells).length}</div>
+            <div className="col text-dim desktop-only">{new Date(box.createdAt || Date.now()).toLocaleDateString()}</div>
+            <div className="col actions">
+              <button className="btn-icon-small" onClick={(e) => {
+                e.stopPropagation();
+                onDelete(box.id);
+              }}>
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const DashboardView = ({ boxes, setShowNewBoxModal }: any) => {
+  const navigate = useNavigate();
+  return (
+    <div className="dashboard-layout">
+      <div className="stats-row">
+        <div className="card glass">
+          <div className="card-header">
+            <Package size={20} color="var(--accent-cyan)" />
+            <h3>Storage Boxes</h3>
+          </div>
+          <div className="stat-value">{boxes.length}</div>
+        </div>
+        <div className="card glass">
+          <div className="card-header">
+            <GridIcon size={20} color="var(--accent-emerald)" />
+            <h3>Total Slots</h3>
+          </div>
+          <div className="stat-value">
+            {boxes.reduce((acc: number, b: Box) => acc + (b.rows * b.cols), 0).toLocaleString()}
+          </div>
+        </div>
+        <div className="card glass">
+          <div className="card-header">
+            <Calendar size={20} color="#a855f7" />
+            <h3>Active Samples</h3>
+          </div>
+          <div className="stat-value">
+            {boxes.reduce((acc: number, b: Box) => acc + Object.keys(b.cells).length, 0)}
+          </div>
+        </div>
+      </div>
+
+      <div className="recent-activity section">
+        <h3>Recent Storage Units</h3>
+        <div className="boxes-grid">
+          {boxes.slice(0, 4).map((box: Box) => (
+            <div key={box.id} className="box-card glass" onClick={() => navigate(`/box/${box.id}`)}>
+              <div className="box-card-icon">
+                <GridIcon size={24} color="var(--accent-cyan)" />
+              </div>
+              <div className="box-card-content">
+                <h4>{box.name}</h4>
+                <p>{box.rows}x{box.cols} • {Object.keys(box.cells).length} items</p>
+              </div>
+            </div>
+          ))}
+          <div className="box-card glass add-new" onClick={() => setShowNewBoxModal(true)}>
+            <Plus size={32} opacity={0.3} />
+            <p>Register New Unit</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default App;
