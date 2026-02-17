@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type { Box, BoxCell } from '../lib/storage';
 import { GridSystem } from './GridSystem';
 import { QRCodeLabel } from './QRCodeLabel';
@@ -20,6 +21,15 @@ export const BoxView: React.FC<BoxViewProps> = ({ box, onBack, onUpdate, onDelet
     const [isResizing, setIsResizing] = useState(false);
     const [tempRows, setTempRows] = useState(box.rows);
     const [tempCols, setTempCols] = useState(box.cols);
+    const [searchParams] = useSearchParams();
+
+    useEffect(() => {
+        const cellId = searchParams.get('cell');
+        if (cellId && box.cells[cellId]) {
+            const [r, c] = cellId.split('-').map(Number);
+            handleCellClick(r, c);
+        }
+    }, [searchParams, box.id]);
 
     const handleCellClick = (row: number, col: number) => {
         setSelectedCell({ row, col });

@@ -5,6 +5,7 @@ import type { Box } from './lib/storage';
 import { storage } from './lib/storage';
 import { NewBoxModal } from './components/NewBoxModal';
 import { BoxView } from './components/BoxView';
+import { GlobalSearch } from './components/GlobalSearch';
 import confetti from 'canvas-confetti';
 import './App.css';
 import './components/Modal.css';
@@ -56,6 +57,11 @@ function App() {
     await storage.saveBox(box);
     const updatedBoxes = await storage.getBoxes();
     setBoxes(updatedBoxes);
+  };
+
+  const handleSelectSearchResult = (boxId: string, cellId?: string) => {
+    navigate(`/box/${boxId}${cellId ? `?cell=${cellId}` : ''}`);
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -130,15 +136,7 @@ function App() {
             <p className="status-text"><span className="status-dot"></span> Secure Storage Active</p>
           </div>
           <div className="header-actions">
-            <div className="search-bar desktop-only">
-              <Search size={18} />
-              <input
-                type="text"
-                placeholder="Filter boxes..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-            </div>
+            <GlobalSearch boxes={boxes} onSelectResult={handleSelectSearchResult} />
             <button className="btn-primary glow-emerald" onClick={() => setShowNewBoxModal(true)}>
               <Plus size={18} />
               <span className="btn-text">New Box</span>
