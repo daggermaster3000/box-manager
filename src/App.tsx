@@ -206,7 +206,7 @@ function App() {
                     </div>
                     <div className="col">{box.rows}x{box.cols}</div>
                     <div className="col">{Object.keys(box.cells).length}</div>
-                    <div className="col text-dim">{new Date(box.createdAt).toLocaleDateString()}</div>
+                    <div className="col text-dim">{new Date(box.createdAt || Date.now()).toLocaleDateString()}</div>
                     <div className="col actions">
                       <button className="btn-icon-small" onClick={(e) => {
                         e.stopPropagation();
