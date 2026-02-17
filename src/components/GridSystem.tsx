@@ -2,6 +2,13 @@ import { useMemo } from 'react';
 import type { Box } from '../lib/storage';
 import { motion } from 'framer-motion';
 
+const TYPE_ICONS: Record<string, string> = {
+    plasmid: '/assets/plasmid.png',
+    reagent: '/assets/reagent.png',
+    primers: '/assets/primer.png',
+    aliquot: '/assets/aliquot.png',
+};
+
 interface GridSystemProps {
     box: Box;
     onCellClick: (row: number, col: number) => void;
@@ -41,7 +48,7 @@ export const GridSystem: React.FC<GridSystemProps> = ({ box, onCellClick, select
                         <motion.div
                             key={`${row}-${col}`}
                             className={`grid-cell ${data ? data.type : 'empty'} ${isSelected ? 'selected' : ''}`}
-                            whileHover={{ scale: 1.1, zIndex: 1 }}
+                            whileHover={{ scale: 1.1, zIndex: 10 }}
                             onClick={() => onCellClick(row, col)}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -49,7 +56,13 @@ export const GridSystem: React.FC<GridSystemProps> = ({ box, onCellClick, select
                         >
                             {data && (
                                 <>
-                                    <div className="cell-indicator" />
+                                    <div className="cell-visual-wrapper">
+                                        {TYPE_ICONS[data.type] ? (
+                                            <img src={TYPE_ICONS[data.type]} alt={data.type} className="cell-icon-image" />
+                                        ) : (
+                                            <div className="cell-indicator" />
+                                        )}
+                                    </div>
                                     {data.name && <div className="cell-name">{data.name}</div>}
                                 </>
                             )}

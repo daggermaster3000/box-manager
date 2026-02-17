@@ -4,7 +4,7 @@ export interface BoxCell {
     id: string;
     name: string;
     content: string;
-    type: 'sample' | 'control' | 'primers' | 'plasmid' | 'antibody' | 'reagent' | 'empty';
+    type: 'sample' | 'control' | 'primers' | 'plasmid' | 'antibody' | 'reagent' | 'aliquot' | 'empty';
     updatedAt: number;
 }
 

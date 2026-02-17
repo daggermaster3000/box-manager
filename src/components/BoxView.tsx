@@ -223,6 +223,7 @@ export const BoxView: React.FC<BoxViewProps> = ({ box, onBack, onUpdate, onDelet
                                         <option value="plasmid">Plasmid</option>
                                         <option value="antibody">Antibody</option>
                                         <option value="reagent">Reagent</option>
+                                        <option value="aliquot">Aliquot</option>
                                     </select>
                                 </div>
                                 <div className="editor-actions">
